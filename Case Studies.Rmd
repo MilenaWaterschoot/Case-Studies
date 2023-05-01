@@ -1,0 +1,86 @@
+---
+title: "Case Studies"
+author: "Jolien De Clercq"
+date: "2023-05-01"
+output: html_document
+---
+
+```{r, packages}
+# loading packages
+library(readxl)
+library(lavaan)
+library(QuantPsyc)
+library(semTools)
+```
+
+```{r, import and manipulate data}
+# reading in dataset
+data <- read.csv(file = "Data2.csv", sep = ";")
+dataXL <- read_excel('dataset_study2_OSF.xlsx')
+
+# remove columns we do not want
+data$FBI          <- NULL
+data$MSFU_Passive <- NULL
+data$MSFU_Private <- NULL
+data$MSFU_Public  <- NULL
+```
+
+```{r, volledig model 3}
+# COMF -> CSS -> RSES -> Stress + Anxiety + Depression 
+model3 <- '# direct effect 
+              DASS_stress + DASS_anxiety + DASS_depression ~ c*COMF
+           # indirect effect 1
+              CSS ~ a1*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b1*CSS
+           # indirect effect 2
+              RSES ~ a2*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b2*RSES
+           # indirect effect 3
+              RSES ~ b3*CSS
+           # indirect effect 1
+              a1b1 := a1*b1
+           # indirect effect 2
+              a2b2 := a2*b2 
+           # indirect effect 3
+              a1b3b2 := a1*b3*b2
+           # total effect 
+              total := c + (a1*b1) + (a2*b2) + (a1*b3*b2)'
+fit3 <- sem(model3, data = dataXL, se = 'bootstrap')
+summary(fit3)
+```
+```{r, model 3 without path3}
+# COMF -> CSS -> RSES -> Stress + Anxiety + Depression 
+model4 <- '# direct effect 
+              DASS_stress + DASS_anxiety + DASS_depression ~ c*COMF
+           # indirect effect 1
+              CSS ~ a1*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b1*CSS
+           # indirect effect 2
+              RSES ~ a2*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b2*RSES
+           # indirect effect 1
+              a1b1 := a1*b1
+           # indirect effect 2
+              a2b2 := a2*b2 
+           # total effect 
+              total := c + (a1*b1) + (a2*b2)'
+fit4 <- sem(model4, data = dataXL, se = 'bootstrap')
+summary(fit4)
+```
+
+```{r, comparing models: likelihood ratio test}
+# log-likelihood values 
+LL1 <- summary(fit3)$LogLik
+LL2 <- summary(fit4)$LogLik
+# likelihood ratio test 
+LRtest <- anova(fit3, fit4)
+print(LRtest)
+```
+
+
+The likelihood ratio test compares the goodness of fit of two nested regression models. 
+H0: The full model and the nested model fit the data equally well. Thus, you should use the nested model
+Ha: The full model fits the data significantly better than the nested model. Thus, you should use the full model 
+
+In our analysis, the p-value < .001, therefore we can reject the null hypothesis and we can conclude that the full model offers a significantly better fit 
+
