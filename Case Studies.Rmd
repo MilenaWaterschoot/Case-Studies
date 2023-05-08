@@ -11,18 +11,20 @@ library(readxl)
 library(lavaan)
 library(QuantPsyc)
 library(semTools)
+library(diagram)
 ```
 
 ```{r, import and manipulate data}
 # reading in dataset
-data <- read.csv(file = "Data2.csv", sep = ";")
-dataXL <- read_excel('dataset_study2_OSF.xlsx')
+data1 <- read_excel('dataset_study1_OSF.xlsx')
+data2 <- read_excel('dataset_study2_OSF.xlsx')
 
-# remove columns we do not want
-data$FBI          <- NULL
-data$MSFU_Passive <- NULL
-data$MSFU_Private <- NULL
-data$MSFU_Public  <- NULL
+# remove extra columns in data2 
+data2$CI  = NULL
+data2$CI2 = NULL
+
+# add the two datasets together
+dataXL <- rbind(data1, data2)
 ```
 
 ```{r, volledig model 3}
@@ -84,3 +86,32 @@ Ha: The full model fits the data significantly better than the nested model. Thu
 
 In our analysis, the p-value < .001, therefore we can reject the null hypothesis and we can conclude that the full model offers a significantly better fit 
 
+```{r, Visualization Mediation Model without Path CSS -> RSES}
+data <- c(0, "'0.480*'", 0,0,
+          0, 0, 0,0,
+          "'0.016'", "'0.043*'", 0,"'-0.404*'",
+          0, "'-0.103*'", 0,0)
+M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
+plot<- plotmat (M, pos=c(1,2,1), 
+                name= c( "CSS","COMF", "DASS", "RSES"), 
+                box.type = "rect", box.size = 0.09, box.prop=0.5,  curve=0, shadow.size = 0)
+```
+```{r, Visualization Mediation Model with Path CSS -> RSES}
+data <- c(0, "'0.480*'", 0,0,
+          0, 0, 0,0,
+          "'0.016'", "'0.043*'", 0,"'-0.404*'",
+          "'-0.264*'", "'-0.103*'", 0,0)
+M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
+
+curves <- c(0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            -0.1, 0, 0, 0)
+curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
+
+
+plot<- plotmat (M, pos=c(1,2,1), 
+                name= c( "CSS","COMF", "DASS", "RSES"), 
+                box.type = "rect", box.size = 0.09, box.prop=0.5, shadow.size = 0,
+                arr.pos = 0.4, curve = curvez)
+```
