@@ -103,11 +103,11 @@ data <- c(0, "'0.024'", 0,"'-0.264*'",
           0, "'0.480*'", 0,0)
 M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
 
-# curves <- c(0, 0, 0, 0,
-#             0, 0, 0, 0,
-#             0, 0, 0, 0,
-#             0, 0, 0, 0)
-# curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
+curves <- c(0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0)
+curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
 
 
 plot2 <- plotmat (M, pos=c(1,2,1),
@@ -122,17 +122,17 @@ data <- c(0, "'-0.103*'", 0,0,
           0, "'0.480*'", 0,0)
 M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
 
-# curves <- c(0, 0, 0, 0,
-#             0, 0, 0, 0,
-#             0, 0, 0, 0,
-#             0, 0, 0, 0)
-# curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
+curves <- c(0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0)
+curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
 
 
 plot2 <- plotmat (M, pos=c(1,2,1),
                 name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), 
                 box.type = "rect", box.size = 0.12, box.prop=0.5, shadow.size = 0,
-                arr.pos = 0.4)
+                arr.pos = 0.4, curve = curvez)
 ```
 
 ```{r, power analysis}
