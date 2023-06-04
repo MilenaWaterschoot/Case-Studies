@@ -5,13 +5,15 @@ date: "2023-05-01"
 output: html_document
 ---
 
-```{r, packages}
+```{r, packages, message = FALSE}
 # loading packages
 library(readxl)
 library(lavaan)
 library(QuantPsyc)
 library(semTools)
 library(diagram)
+library(WebPower)
+library(car)
 ```
 
 ```{r, import and manipulate data}
@@ -27,16 +29,24 @@ data2$CI2 = NULL
 dataXL <- rbind(data1, data2)
 ```
 
-```{r, volledig model 3}
+```{r, linear regression Facebook use}
+# which type of facebook use can explain social comparison the best?
+fit <- lm(COMF ~ 1 + MSFUP + MSFUaprivate + MSFUapublic, dataXL)
+summary(fit)
+Anova(fit)
+coef(fit)
+```
+
+```{r, model with path CSS -> RSES}
 # COMF -> CSS -> RSES -> Stress + Anxiety + Depression 
 model3 <- '# direct effect 
               DASS_stress + DASS_anxiety + DASS_depression ~ c*COMF
            # indirect effect 1
-              CSS ~ a1*COMF
-              DASS_stress + DASS_anxiety + DASS_depression ~ b1*CSS
+              RSES ~ a1*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b1*RSES
            # indirect effect 2
-              RSES ~ a2*COMF
-              DASS_stress + DASS_anxiety + DASS_depression ~ b2*RSES
+              CSS ~ a2*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b2*CSS
            # indirect effect 3
               RSES ~ b3*CSS
            # indirect effect 1
@@ -44,30 +54,30 @@ model3 <- '# direct effect
            # indirect effect 2
               a2b2 := a2*b2 
            # indirect effect 3
-              a1b3b2 := a1*b3*b2
+              a2b3b1 := a2*b3*b1
            # total effect 
-              total := c + (a1*b1) + (a2*b2) + (a1*b3*b2)'
-fit3 <- sem(model3, data = dataXL, se = 'bootstrap')
-summary(fit3)
+              total := c + (a1*b1) + (a2*b2) + (a2*b3*b1)'
+fit3 <- sem(model3, data = dataXL, se = 'bootstrap', set.seed(1))
+summary(fit3, ci = TRUE, standardized = TRUE)
 ```
-```{r, model 3 without path3}
+```{r, model without path CSS -> RSES}
 # COMF -> CSS -> RSES -> Stress + Anxiety + Depression 
 model4 <- '# direct effect 
               DASS_stress + DASS_anxiety + DASS_depression ~ c*COMF
            # indirect effect 1
-              CSS ~ a1*COMF
-              DASS_stress + DASS_anxiety + DASS_depression ~ b1*CSS
+              RSES ~ a1*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b1*RSES
            # indirect effect 2
-              RSES ~ a2*COMF
-              DASS_stress + DASS_anxiety + DASS_depression ~ b2*RSES
+              CSS ~ a2*COMF
+              DASS_stress + DASS_anxiety + DASS_depression ~ b2*CSS
            # indirect effect 1
               a1b1 := a1*b1
            # indirect effect 2
               a2b2 := a2*b2 
            # total effect 
               total := c + (a1*b1) + (a2*b2)'
-fit4 <- sem(model4, data = dataXL, se = 'bootstrap')
-summary(fit4)
+fit4 <- sem(model4, data = dataXL, se = 'bootstrap', set.seed(1))
+summary(fit4, ci = TRUE, standardized = TRUE)
 ```
 
 ```{r, comparing models: likelihood ratio test}
@@ -86,32 +96,45 @@ Ha: The full model fits the data significantly better than the nested model. Thu
 
 In our analysis, the p-value < .001, therefore we can reject the null hypothesis and we can conclude that the full model offers a significantly better fit 
 
-```{r, Visualization Mediation Model without Path CSS -> RSES}
-data <- c(0, "'0.480*'", 0,0,
-          0, 0, 0,0,
-          "'0.016'", "'0.043*'", 0,"'-0.404*'",
-          0, "'-0.103*'", 0,0)
-M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
-plot<- plotmat (M, pos=c(1,2,1), 
-                name= c( "CSS","COMF", "DASS", "RSES"), 
-                box.type = "rect", box.size = 0.09, box.prop=0.5,  curve=0, shadow.size = 0)
-```
 ```{r, Visualization Mediation Model with Path CSS -> RSES}
-data <- c(0, "'0.480*'", 0,0,
+data <- c(0, "'0.024'", 0,"'-0.264*'",
           0, 0, 0,0,
-          "'0.016'", "'0.043*'", 0,"'-0.404*'",
-          "'-0.264*'", "'-0.103*'", 0,0)
+          "'-0.404*'", "'0.043*'", 0,"'0.016'",
+          0, "'0.480*'", 0,0)
 M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
 
-curves <- c(0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            -0.1, 0, 0, 0)
-curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
+# curves <- c(0, 0, 0, 0,
+#             0, 0, 0, 0,
+#             0, 0, 0, 0,
+#             0, 0, 0, 0)
+# curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
 
 
-plot<- plotmat (M, pos=c(1,2,1), 
-                name= c( "CSS","COMF", "DASS", "RSES"), 
-                box.type = "rect", box.size = 0.09, box.prop=0.5, shadow.size = 0,
-                arr.pos = 0.4, curve = curvez)
+plot2 <- plotmat (M, pos=c(1,2,1),
+                  name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), 
+                  box.type = "rect", box.size = 0.11, box.prop=0.5, shadow.size = 0,
+                  arr.pos = 0.4, curve = curvez)
+```
+```{r, Visualization Mediation Model without Path CSS -> RSES}
+data <- c(0, "'-0.103*'", 0,0,
+          0, 0, 0,0,
+          "'-0.404*'", "'0.043*'", 0,"'0.016'",
+          0, "'0.480*'", 0,0)
+M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
+
+# curves <- c(0, 0, 0, 0,
+#             0, 0, 0, 0,
+#             0, 0, 0, 0,
+#             0, 0, 0, 0)
+# curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
+
+
+plot2 <- plotmat (M, pos=c(1,2,1),
+                name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), 
+                box.type = "rect", box.size = 0.12, box.prop=0.5, shadow.size = 0,
+                arr.pos = 0.4)
+```
+
+```{r, power analysis}
+wp.mediation(n = 675, a = 0.2, b = 0.2, varx = 1, vary = 1, varm = 1, alpha = 0.05)
 ```
