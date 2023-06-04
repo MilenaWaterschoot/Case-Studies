@@ -97,42 +97,27 @@ Ha: The full model fits the data significantly better than the nested model. Thu
 In our analysis, the p-value < .001, therefore we can reject the null hypothesis and we can conclude that the full model offers a significantly better fit 
 
 ```{r, Visualization Mediation Model with Path CSS -> RSES}
-data <- c(0, "'0.024'", 0,"'-0.264*'",
+data <- c(0, "'0.034'", 0,"'-0.384*'",
           0, 0, 0,0,
-          "'-0.404*'", "'0.043*'", 0,"'0.016'",
-          0, "'0.480*'", 0,0)
+          "'-0.514*'", "'0.077*'", 0,"'0.030'",
+          0, "'0.466*'", 0,0)
 M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
 
-curves <- c(0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0)
-curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
-
-
 plot2 <- plotmat (M, pos=c(1,2,1),
-                  name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), 
-                  box.type = "rect", box.size = 0.11, box.prop=0.5, shadow.size = 0,
-                  arr.pos = 0.4, curve = curvez)
+                  name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), box.type = "rect", box.size = 0.1, box.prop=0.5, shadow.size = 0,
+                  arr.pos = 0.4, curve = 0)
 ```
 ```{r, Visualization Mediation Model without Path CSS -> RSES}
-data <- c(0, "'-0.103*'", 0,0,
+data <- c(0, "'-0.145*'", 0,0,
           0, 0, 0,0,
-          "'-0.404*'", "'0.043*'", 0,"'0.016'",
-          0, "'0.480*'", 0,0)
+          "'-0.516*'", "'0.077*'", 0,"'0.030'",
+          0, "'0.466*'", 0,0)
 M <- matrix (nrow=4, ncol=4, byrow = TRUE, data=data)
 
-curves <- c(0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0)
-curvez <- matrix (nrow=4, ncol=4, byrow = TRUE, data=curves)
-
-
 plot2 <- plotmat (M, pos=c(1,2,1),
-                name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent \nSelf-Esteem"), 
-                box.type = "rect", box.size = 0.12, box.prop=0.5, shadow.size = 0,
-                arr.pos = 0.4, curve = curvez)
+                name= c("Global \nSelf-Esteem","Social Comparison \non Facebook", "Despression, \nAnxiety, \nStress Symptoms", "Contingent   \nSelf-Esteem"), 
+                box.type = "rect", box.size = 0.1, box.prop=0.5, shadow.size = 0,
+                arr.pos = 0.5, curve = 0)
 ```
 
 ```{r, power analysis}
